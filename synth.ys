@@ -1,0 +1,19 @@
+#!/usr/bin/env yosys
+
+exec -expect-return 0 -- mkdir -p synth
+exec -expect-return 0 -- ./spice2verilog.py > synth/challenge.v
+exec -expect-return 0 -- ./create_lib.py > synth/lib.v
+
+read_verilog synth/lib.v
+read_verilog synth/challenge.v
+read_verilog -sv challenge_top.v
+
+hierarchy -top challenge_top
+proc
+memory
+flatten
+opt -purge -full
+write_json synth/challenge.json
+
+sim -clock clk_10 -zinit -n 0 -w
+write_verilog -noattr synth/challenge_synth.v
