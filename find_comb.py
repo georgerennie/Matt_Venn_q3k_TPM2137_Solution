@@ -75,14 +75,6 @@ model = get_model(formula)
 
 target = [int(model.get_py_value(symb_map[net])) for net in drivers]
 
-def hamming_distance(a, b):
-    assert len(a) == len(b)
-    s = 0
-    for i in range(len(a)):
-        if a[i] != b[i]:
-            s += 1
-    return s
-
 with open("sim_template.v") as f:
     t = Template(f.read())
 
