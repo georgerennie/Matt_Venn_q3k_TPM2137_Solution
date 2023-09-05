@@ -6,5 +6,5 @@ all:
 	./find_comb.py
 
 clean:
-	rm -r ext sim synth
+	rm -rf ext sim synth
 

@@ -3,10 +3,10 @@
 CELL_NAME=challenge
 GDS_FILE=challenge.gds
 LVS_FILE=challenge.spice
-RC_FILE=/usr/local/share/pdk/sky130A/libs.tech/magic/sky130A.magicrc
+RC_FILE=$PDK_ROOT/sky130A/libs.tech/magic/sky130A.magicrc
 OUT_DIR=./ext/
 
-rm $OUT_DIR -r
+rm $OUT_DIR -rf
 mkdir $OUT_DIR
 
 magic -dnull -noconsole -rcfile $RC_FILE << EOF
