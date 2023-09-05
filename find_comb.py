@@ -7,6 +7,8 @@ from collections import defaultdict
 from pysmt.shortcuts import FreshSymbol, Not, And, Or, Iff, get_model, TRUE
 import subprocess
 
+print("Loading circuit")
+
 with open("synth/challenge.json") as f:
     m = Prodict.from_dict(json.load(f)).modules.challenge_top
 
@@ -64,11 +66,13 @@ def get_driver_ffs(net):
 
     return ffs
 
+print("Finding FFs and constructing comb logic graph")
 # Find FF outputs that are combinationally reachable from led_green
 exit_net = m.netnames.led_green.bits[0]
 drivers = list(get_driver_ffs(exit_net))
 assert len(drivers) == 64
 
+print("Solving for required FF values")
 # Find assignments that make the model true
 formula = And(*clauses, Not(symb_map[exit_net]))
 model = get_model(formula)
@@ -86,9 +90,13 @@ def sim(bits):
     subprocess.run(["iverilog", "-g2012", "sim/tb.v", "synth/challenge_synth.v", "-o", "sim/tb.vvp"])
     output = subprocess.Popen("vvp sim/tb.vvp", shell=True, stdout=subprocess.PIPE).stdout.read()
 
-    assert len(output) == 64
+    assert len(output) >= 64
+    output = output[:64]
+    for c in output.decode("ascii"):
+        assert c == '0' or c == '1'
     return [int(c == ord('1')) for c in output]
 
+print("Simulating to find FFs")
 result_bin = []
 for i in range(64):
     bits = [0 for _ in range(64)]
@@ -100,6 +108,7 @@ for i in range(64):
     output_idx = res.index(1)
     result_bin.append(target[output_idx])
 
+print("Constructing solution")
 result = ""
 for idx in range(0, len(result_bin), 8):
     byte_list = result_bin[idx:idx+8]
